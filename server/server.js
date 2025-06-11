@@ -22,7 +22,7 @@ const wss = new WebSocket.Server({ server });
 
 // Environment variables
 const PORT = process.env.APP_PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const NODE_ENV = process.env.APP_ENV || 'development';
 
 // FIXED: Security middleware dengan CSP yang benar
 app.use(helmet({

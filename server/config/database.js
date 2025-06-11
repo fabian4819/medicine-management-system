@@ -32,7 +32,7 @@ const localMySQLConfig = {
     charset: 'utf8mb4'
 };
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.APP_ENV === 'production';
 const useAiven = process.env.USE_AIVEN === 'true' || isProduction;
 
 const pool = mysql.createPool(useAiven ? aivenMySQLConfig : localMySQLConfig);
