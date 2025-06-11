@@ -21,7 +21,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Environment variables
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.APP_PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // FIXED: Security middleware dengan CSP yang benar
