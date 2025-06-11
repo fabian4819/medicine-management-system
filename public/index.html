@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Obat</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-items">
+                <a href="#" class="nav-item">PENDAFTARAN</a>
+                <a href="#" class="nav-item">PEMERIKSAAN</a>
+                <a href="#" class="nav-item">RM</a>
+                <a href="#" class="nav-item">KLAIM</a>
+                <a href="#" class="nav-item">LAPORAN</a>
+                <a href="#" class="nav-item">BPJS</a>
+                <a href="#" class="nav-item">APOTEK</a>
+                <a href="#" class="nav-item">GF</a>
+                <a href="#" class="nav-item">KASIR</a>
+                <a href="#" class="nav-item">MANAJEMEN DATA</a>
+                <a href="#" class="nav-item">IOT</a>
+                <a href="#" class="nav-item">FARMASIBS</a>
+                <a href="#" class="nav-item">HELP</a>
+            </div>
+            
+            <div class="nav-icons">
+                <div class="nav-icon clipboard" onclick="showView('kepatuhan')" title="Kepatuhan Minum Obat">
+                    <span>📋</span>
+                </div>
+                <div class="nav-icon report" onclick="showView('laporan')" title="Laporan">
+                    <span>📊</span>
+                </div>
+                <div class="nav-icon file" onclick="showView('riwayat')" title="Riwayat Pemantauan">
+                    <span>📁</span>
+                </div>
+                <div class="nav-icon file" onclick="showView('catatan')" title="Catatan Pengingat">
+                    <span>📝</span>
+                </div>
+                <div class="nav-icon clipboard" onclick="showView('notifikasi')" title="Notifikasi">
+                    <span>🔔</span>
+                </div>
+                <div class="nav-icon clipboard" onclick="showView('pasien')" title="Data Pasien">
+                    <span>👥</span>
+                </div>
+                <div class="nav-icon clipboard" onclick="showView('obat')" title="Data Obat">
+                    <span>💊</span>
+                </div>
+                <div class="nav-icon medicine" onclick="showView('monitoring')" title="Monitoring Real-time">
+                    <span>📈</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Memuat data...</p>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Kepatuhan Minum Obat View -->
+            <div id="kepatuhan-view">
+                <div class="content-header">
+                    📋 Kepatuhan Minum Obat
+                </div>
+                <div class="content-body">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cari pasien berdasarkan nama atau nomor RM...">
+                        <button class="search-btn" onclick="searchPatients()">🔍</button>
+                        <button class="refresh-btn" onclick="loadPatients()">🔄</button>
+                        <button class="filter-btn" onclick="showFilterModal()">🔽 Filter</button>
+                    </div>
+
+                    <!-- Filter Panel (Hidden by default) -->
+                    <div id="filterPanel" class="filter-panel" style="display: none;">
+                        <div class="filter-row">
+                            <select id="filterGender" class="filter-select">
+                                <option value="">Semua Jenis Kelamin</option>
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                            <select id="filterCompliance" class="filter-select">
+                                <option value="">Semua Tingkat Kepatuhan</option>
+                                <option value="high">Tinggi (>80%)</option>
+                                <option value="medium">Sedang (50-80%)</option>
+                                <option value="low">Rendah (<50%)</option>
+                            </select>
+                            <button class="apply-filter-btn" onclick="applyFilters()">Terapkan Filter</button>
+                            <button class="clear-filter-btn" onclick="clearFilters()">Hapus Filter</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <span>Tanggal Resep</span>
+                            <span>No RM</span>
+                            <span>Nama Pasien</span>
+                            <span>Jenis Kelamin</span>
+                            <span>Persentase Kepatuhan</span>
+                            <span>Obat</span>
+                            <span>Status</span>
+                            <span>Aksi</span>
+                        </div>
+                        <div id="patientsTableBody">
+                            <!-- Data akan dimuat dari database -->
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevBtn" onclick="previousPage()" disabled>← Sebelumnya</button>
+                        <span id="pageInfo">Halaman 1 dari 1</span>
+                        <button id="nextBtn" onclick="nextPage()" disabled>Selanjutnya →</button>
+                    </div>
+
+                    <div class="export-buttons">
+                        <button class="export-btn excel-btn" onclick="exportToExcel()">📊 Export Excel</button>
+                        <button class="export-btn pdf-btn" onclick="exportToPDF()">📄 Export PDF</button>
+                        <button class="export-btn refresh-btn" onclick="syncData()">🔄 Sinkronisasi Data</button>
+                        <button class="export-btn close-btn" onclick="confirmClose()">❌ Tutup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring View -->
+            <div id="monitoring-view" style="display: none;">
+                <div class="content-header">
+                    📈 Pemantauan Minum Obat Real-time
+                </div>
+                <div class="content-body">
+                    <div class="monitoring-dashboard">
+                        <div class="stat-cards">
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-info">
+                                    <h3 id="totalPatients">0</h3>
+                                    <p>Total Pengguna</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💊</div>
+                                <div class="stat-info">
+                                    <h3 id="activeNotifications">0</h3>
+                                    <p>Notifikasi Aktif</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
+                                    <h3 id="todayCompliance">0%</h3>
+                                    <p>Kepatuhan Hari Ini</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⚠️</div>
+                                <div class="stat-info">
+                                    <h3 id="missedDoses">0</h3>
+                                    <p>Dosis Terlewat</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Real-time Status -->
+                        <div class="realtime-status">
+                            <h3>Status Koneksi Real-time</h3>
+                            <div id="connectionStatus" class="connection-status offline">
+                                <span class="status-indicator"></span>
+                                <span class="status-text">Terputus</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Today's Schedule -->
+                        <div class="today-schedule">
+                            <h3>Jadwal Hari Ini</h3>
+                            <div id="todayScheduleList">
+                                <!-- Data jadwal hari ini -->
+                            </div>
+                        </div>
+                        
+                        <div class="recent-activity">
+                            <h3>Aktivitas Terbaru</h3>
+                            <div id="recentActivityList">
+                                <!-- Data aktivitas real-time -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Pasien View -->
+            <div id="pasien-view" style="display: none;">
+                <div class="content-header">
+                    👥 Data Pasien (Pengguna)
+                </div>
+                <div class="content-body">
+                    <div class="action-buttons">
+                        <button class="add-btn" onclick="showAddPatientModal()">➕ Tambah Pasien</button>
+                        <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <span>ID</span>
+                            <span>Nama Lengkap</span>
+                            <span>Tanggal Lahir</span>
+                            <span>Jenis Kelamin</span>
+                            <span>No RM</span>
+                            <span>Aksi</span>
+                        </div>
+                        <div id="usersTableBody">
+                            <!-- Data pengguna -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifikasi View -->
+            <div id="notifikasi-view" style="display: none;">
+                <div class="content-header">
+                    🔔 Notifikasi Pengingat Obat
+                </div>
+                <div class="content-body">
+                    <div class="filter-tabs">
+                        <button class="tab-btn active" onclick="filterNotifications('all')">Semua</button>
+                        <button class="tab-btn" onclick="filterNotifications('today')">Hari Ini</button>
+                        <button class="tab-btn" onclick="filterNotifications('overdue')">Terlambat</button>
+                        <button class="tab-btn" onclick="filterNotifications('completed')">Selesai</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <span>Tanggal Konsumsi</span>
+                            <span>Hari Ke</span>
+                            <span>Nama Obat</span>
+                            <span>Dosis</span>
+                            <span>Status</span>
+                            <span>Pasien</span>
+                            <span>Aksi</span>
+                        </div>
+                        <div id="notificationsTableBody">
+                            <!-- Data notifikasi -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Patient Detail Modal -->
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="content-header" style="margin: -30px -30px 20px -30px;">
+                📋 Laporan Kepatuhan Minum Obat Pasien
+            </div>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Nama Pasien</div>
+                    <div class="detail-value" id="modalPatientName">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Persentase Kepatuhan</div>
+                    <div class="detail-value" id="modalCompliance">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Nomer RM</div>
+                    <div class="detail-value" id="modalRMNumber">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Jenis Kelamin</div>
+                    <div class="detail-value" id="modalGender">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Tanggal Lahir</div>
+                    <div class="detail-value" id="modalBirthDate">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Durasi Konsumsi</div>
+                    <div class="detail-value" id="modalDuration">-</div>
+                </div>
+            </div>
+
+            <!-- Riwayat Konsumsi -->
+            <div class="consumption-history">
+                <h3>Riwayat Konsumsi Obat</h3>
+                <div class="table-container">
+                    <div class="table-header" style="grid-template-columns: 1fr 0.8fr 1.2fr 1fr 1.2fr 1fr;">
+                        <span>Tanggal</span>
+                        <span>Waktu</span>
+                        <span>Nama Obat</span>
+                        <span>Status</span>
+                        <span>Waktu Aktual</span>
+                        <span>Keterangan</span>
+                    </div>
+                    <div id="modalTableBody">
+                        <!-- Data konsumsi obat -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-btn excel-btn" onclick="exportPatientDetail()">📊 Export</button>
+                <button class="export-btn print-btn" onclick="printPatientDetail()">🖨️ Print</button>
+                <button class="export-btn close-btn" onclick="closeModal()">✕ Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div id="addPatientModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeAddPatientModal()">&times;</button>
+            <div class="content-header" style="margin: -30px -30px 20px -30px;">
+                ➕ Tambah Pasien Baru
+            </div>
+            
+            <form id="addPatientForm" onsubmit="submitPatient(event)">
+                <div class="form-group">
+                    <label for="patientName">Nama Lengkap *</label>
+                    <input type="text" id="patientName" name="nama_lengkap" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientBirthDate">Tanggal Lahir</label>
+                    <input type="date" id="patientBirthDate" name="tanggal_lahir">
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientGender">Jenis Kelamin</label>
+                    <select id="patientGender" name="jenis_kelamin">
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-Laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientPassword">Password *</label>
+                    <input type="password" id="patientPassword" name="password" required>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="save-btn">💾 Simpan</button>
+                    <button type="button" class="cancel-btn" onclick="closeAddPatientModal()">❌ Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Update Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeNotificationModal()">&times;</button>
+            <div class="content-header" style="margin: -30px -30px 20px -30px;">
+                🔔 Update Status Konsumsi Obat
+            </div>
+            
+            <form id="updateNotificationForm" onsubmit="updateNotificationStatus(event)">
+                <input type="hidden" id="notificationId" name="id_notifikasi">
+                
+                <div class="form-group">
+                    <label>Nama Obat</label>
+                    <input type="text" id="notifMedicineName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tanggal & Waktu Terjadwal</label>
+                    <input type="text" id="notifScheduledTime" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notifStatus">Status Konsumsi *</label>
+                    <select id="notifStatus" name="keterangan_konsumsi" required>
+                        <option value="Dikonsumsi">Dikonsumsi</option>
+                        <option value="Tidak Dikonsumsi">Tidak Dikonsumsi</option>
+                        <option value="Tunda">Ditunda</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notifNotes">Catatan</label>
+                    <textarea id="notifNotes" name="catatan" rows="3"></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="save-btn">💾 Update</button>
+                    <button type="button" class="cancel-btn" onclick="closeNotificationModal()">❌ Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="toast error-toast" style="display: none;">
+        <span id="errorMessage"></span>
+        <button onclick="hideToast('errorToast')">&times;</button>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="toast success-toast" style="display: none;">
+        <span id="successMessage"></span>
+        <button onclick="hideToast('successToast')">&times;</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

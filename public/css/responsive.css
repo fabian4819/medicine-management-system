@@ -1,0 +1,341 @@
+/* Responsive Design */
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .nav-items {
+        gap: 20px;
+    }
+    
+    .nav-item {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr;
+        gap: 10px;
+        font-size: 13px;
+    }
+    
+    .table-header span:nth-child(6),
+    .table-header span:nth-child(7),
+    .table-row span:nth-child(6),
+    .table-row span:nth-child(7) {
+        display: none;
+    }
+    
+    .stat-cards {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .navbar {
+        padding: 10px 15px;
+    }
+    
+    .nav-items {
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .nav-item {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    .nav-icons {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .nav-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .nav-icon span {
+        font-size: 20px;
+    }
+    
+    .content-header {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+    
+    .content-body {
+        padding: 20px;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr 1fr 1.5fr;
+        gap: 8px;
+        font-size: 12px;
+        min-width: 350px;
+    }
+    
+    .table-header span:nth-child(n+4),
+    .table-row span:nth-child(n+4) {
+        display: none;
+    }
+    
+    .table-row {
+        padding: 12px 10px;
+    }
+    
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .export-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .export-btn {
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pagination button {
+        width: 100%;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        height: 90vh;
+        padding: 15px;
+        margin: 20px;
+    }
+    
+    .stat-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 20px;
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .stat-icon {
+        font-size: 36px;
+    }
+    
+    .stat-info h3 {
+        font-size: 24px;
+    }
+    
+    .toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .nav-items {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .nav-item {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+    
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr 1fr;
+        min-width: 280px;
+    }
+    
+    .table-header span:nth-child(n+3),
+    .table-row span:nth-child(n+3) {
+        display: none;
+    }
+    
+    .content-header {
+        font-size: 14px;
+        padding: 12px 15px;
+    }
+    
+    .content-body {
+        padding: 15px;
+    }
+    
+    .modal-content {
+        height: 95vh;
+        padding: 10px;
+    }
+    
+    .close-modal {
+        top: 10px;
+        right: 15px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 90vh;
+        width: 90%;
+    }
+    
+    .nav-icons {
+        margin-top: 10px;
+    }
+    
+    .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+    }
+    
+    body::before {
+        display: none;
+    }
+    
+    .navbar,
+    .export-buttons,
+    .search-container,
+    .pagination,
+    .action-btn,
+    .close-modal {
+        display: none;
+    }
+    
+    .main-content {
+        box-shadow: none;
+        background: white;
+    }
+    
+    .table-row {
+        break-inside: avoid;
+    }
+    
+    .modal {
+        position: static;
+        display: block;
+        background: none;
+    }
+    
+    .modal-content {
+        box-shadow: none;
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .nav-icon span,
+    .action-btn {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .search-input,
+    .dropdown {
+        background: #34495e;
+        color: white;
+        border-color: #5a6c7d;
+    }
+    
+    .table-row {
+        background: #2c3e50;
+        color: white;
+        border-color: #34495e;
+    }
+    
+    .detail-value {
+        color: #ecf0f1;
+    }
+    
+    .recent-activity {
+        background: #34495e;
+        color: white;
+    }
+    
+    .activity-item {
+        background: #2c3e50;
+        color: white;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .spinner {
+        animation: none;
+    }
+}
+
+/* Focus Styles for Accessibility */
+@media (prefers-reduced-motion: no-preference) {
+    .nav-item:focus,
+    .search-btn:focus,
+    .action-btn:focus,
+    .export-btn:focus {
+        outline: 2px solid #3498db;
+        outline-offset: 2px;
+    }
+}
