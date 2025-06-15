@@ -54,7 +54,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "nodemon": "^3.0.2",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "vercel": "^43.1.0"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -62,10 +63,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/medicine-management-system.git"
+    "url": "git+https://github.com/yourusername/medicine-management-system.git"
   },
   "bugs": {
     "url": "https://github.com/yourusername/medicine-management-system/issues"
   },
-  "homepage": "https://github.com/yourusername/medicine-management-system#readme"
+  "homepage": "https://github.com/yourusername/medicine-management-system#readme",
+  "type": "commonjs"
 }

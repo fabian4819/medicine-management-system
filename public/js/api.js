@@ -1,7 +1,6 @@
-// api.js - CORRECTED VERSION that matches the backend
-console.log('🔗 API.js loaded');
+// API Client untuk komunikasi dengan backend
+console.log('🔗 API Client loaded');
 
-// Simple API client
 class APIClient {
     constructor() {
         this.baseURL = window.location.origin;
@@ -28,7 +27,8 @@ class APIClient {
                 console.log('📡 API Response:', response.status, response.statusText);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
@@ -60,15 +60,23 @@ class APIClient {
         });
     }
 
+    async put(endpoint, data = {}) {
+        return this.request(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async delete(endpoint) {
+        return this.request(endpoint, { method: 'DELETE' });
+    }
+
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
-// Create global API instance
-const api = new APIClient();
-
-// Patient API functions that work with our backend
+// Patient API functions
 const PatientAPI = {
     async getPatients(params = {}) {
         console.log('🔍 PatientAPI.getPatients called with:', params);
@@ -90,11 +98,38 @@ const PatientAPI = {
     async createPatient(data) {
         console.log('🔍 PatientAPI.createPatient called with:', data);
         return api.post('/patients', data);
+    },
+
+    async updatePatient(id, data) {
+        console.log('🔍 PatientAPI.updatePatient called with:', id, data);
+        return api.put(`/patients/${id}`, data);
+    },
+
+    async deletePatient(id) {
+        console.log('🔍 PatientAPI.deletePatient called with id:', id);
+        return api.delete(`/patients/${id}`);
     }
 };
+
+// Health check function
+const HealthAPI = {
+    async check() {
+        try {
+            const response = await api.request('/health', { method: 'GET' });
+            return response;
+        } catch (error) {
+            console.error('❌ Health check failed:', error);
+            throw error;
+        }
+    }
+};
+
+// Create global API instance
+const api = new APIClient();
 
 // Export for use in other files
 if (typeof window !== 'undefined') {
     window.api = api;
     window.PatientAPI = PatientAPI;
+    window.HealthAPI = HealthAPI;
 }

@@ -1,275 +1,102 @@
-// main.js - CORRECTED VERSION
-console.log('🚀 Main.js loaded');
+// Utility functions for the application
+console.log('🔧 Utils loaded');
 
-// Global state
-let currentPage = 1;
-let currentLimit = 10;
-let currentSearch = '';
-let patients = [];
-
-// Initialize application
-async function initializeApp() {
-    try {
-        console.log('🔧 Initializing application...');
-        
-        // Load initial data
-        console.log('📊 Loading initial patient data...');
-        await loadPatients();
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        console.log('✅ Application initialized successfully');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize application:', error);
-        showError('Gagal menginisialisasi aplikasi: ' + error.message);
-    }
-}
-
-// Load patients function
-async function loadPatients() {
-    try {
-        console.log('📊 Loading patients...', { 
-            page: currentPage, 
-            limit: currentLimit, 
-            search: currentSearch 
-        });
-        
-        showLoading(true);
-        
-        const params = {
-            page: currentPage,
-            limit: currentLimit
-        };
-        
-        if (currentSearch) {
-            params.search = currentSearch;
-        }
-        
-        console.log('🔍 Calling PatientAPI.getPatients with params:', params);
-        const response = await PatientAPI.getPatients(params);
-        
-        console.log('✅ Received response:', response);
-        
-        if (response && response.success && response.data) {
-            patients = response.data.patients || [];
-            console.log('👥 Loaded patients:', patients.length);
-            
-            displayPatients(patients);
-            updatePagination(response.data.pagination);
-            
-            showSuccess(`Berhasil memuat ${patients.length} data pasien`);
-        } else {
-            console.warn('⚠️ Invalid response structure:', response);
-            throw new Error('Format response tidak valid');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading patients:', error);
-        showError('Gagal memuat data pasien: ' + error.message);
-        
-        // Show empty state
-        displayPatients([]);
-        updatePagination({ currentPage: 1, totalPages: 1, totalRecords: 0 });
-        
-    } finally {
-        showLoading(false);
-    }
-}
-
-// Display patients in table
-function displayPatients(patientList) {
-    console.log('🖥️ Displaying patients:', patientList.length);
+// Date formatting functions
+function formatDate(dateString) {
+    if (!dateString) return '-';
     
-    const tableBody = document.getElementById('patientsTableBody');
-    if (!tableBody) {
-        console.error('❌ patientsTableBody element not found');
-        return;
-    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     
-    tableBody.innerHTML = '';
-    
-    if (!patientList || patientList.length === 0) {
-        tableBody.innerHTML = `
-            <div class="no-data">
-                <span>🏥 Tidak ada data pasien ditemukan</span>
-            </div>
-        `;
-        return;
-    }
-    
-    patientList.forEach(patient => {
-        const row = createPatientRow(patient);
-        tableBody.appendChild(row);
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
     });
-    
-    console.log('✅ Patients displayed successfully');
 }
 
-// Create patient row
-function createPatientRow(patient) {
-    const row = document.createElement('div');
-    row.className = 'table-row';
+function formatTime(timeString) {
+    if (!timeString) return '-';
     
-    // Format date
-    const prescriptionDate = patient.prescription_date ? 
-        new Date(patient.prescription_date).toLocaleDateString('id-ID') : '-';
+    const date = new Date(timeString);
+    if (isNaN(date.getTime())) return '-';
     
-    // Format gender
-    const gender = patient.gender === 'L' ? 'Laki-laki' : 
-                   patient.gender === 'P' ? 'Perempuan' : '-';
-    
-    // Format compliance percentage
-    const compliance = Math.round(patient.compliance_percentage || 0);
-    const complianceClass = compliance >= 80 ? 'high' : 
-                           compliance >= 50 ? 'medium' : 'low';
-    
-    row.innerHTML = `
-        <span>${prescriptionDate}</span>
-        <span>${patient.rm_number || '-'}</span>
-        <span>${patient.name || '-'}</span>
-        <span>${gender}</span>
-        <span class="compliance ${complianceClass}">${compliance}%</span>
-        <span>${patient.medicine_name || 'Tidak ada obat'}</span>
-        <span class="status ${complianceClass}">
-            ${compliance >= 80 ? 'Baik' : compliance >= 50 ? 'Sedang' : 'Rendah'}
-        </span>
-        <span class="actions">
-            <button class="detail-btn" onclick="showPatientDetail(${patient.id})" title="Lihat Detail">
-                👁️
-            </button>
-            <button class="edit-btn" onclick="editPatient(${patient.id})" title="Edit">
-                ✏️
-            </button>
-        </span>
-    `;
-    
-    return row;
+    return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
-// Update pagination
-function updatePagination(pagination) {
-    console.log('📄 Updating pagination:', pagination);
+function formatDateTime(dateString) {
+    if (!dateString) return '-';
     
-    const pageInfo = document.getElementById('pageInfo');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     
-    if (pageInfo) {
-        pageInfo.textContent = `Halaman ${pagination.currentPage} dari ${pagination.totalPages}`;
-    }
-    
-    if (prevBtn) {
-        prevBtn.disabled = !pagination.hasPrevPage;
-    }
-    
-    if (nextBtn) {
-        nextBtn.disabled = !pagination.hasNextPage;
-    }
+    return date.toLocaleString('id-ID', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
-// Setup event listeners
-function setupEventListeners() {
-    console.log('🎯 Setting up event listeners...');
-    
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce((e) => {
-            currentSearch = e.target.value;
-            currentPage = 1;
-            loadPatients();
-        }, 500));
-    }
-    
-    // Refresh button
-    const refreshBtn = document.querySelector('.refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            currentPage = 1;
-            currentSearch = '';
-            if (searchInput) searchInput.value = '';
-            loadPatients();
-        });
-    }
-    
-    console.log('✅ Event listeners setup complete');
+// String formatting functions
+function capitalizeFirst(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-// Pagination functions
-function previousPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        loadPatients();
-    }
-}
-
-function nextPage() {
-    currentPage++;
-    loadPatients();
-}
-
-// Search function
-function searchPatients() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        currentSearch = searchInput.value;
-        currentPage = 1;
-        loadPatients();
-    }
-}
-
-// Utility functions
-function showLoading(show) {
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    if (loadingIndicator) {
-        loadingIndicator.style.display = show ? 'flex' : 'none';
-    }
-}
-
-function showError(message) {
-    console.error('🚨 Error:', message);
+function formatCurrency(amount) {
+    if (!amount) return 'Rp 0';
     
-    const errorToast = document.getElementById('errorToast');
-    const errorMessage = document.getElementById('errorMessage');
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(amount);
+}
+
+// Validation functions
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validatePhone(phone) {
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+function validateRequired(value) {
+    return value !== null && value !== undefined && value.toString().trim() !== '';
+}
+
+// Compliance badge helper
+function getComplianceBadge(percentage) {
+    const percent = parseInt(percentage) || 0;
+    let className = 'compliance-badge ';
     
-    if (errorToast && errorMessage) {
-        errorMessage.textContent = message;
-        errorToast.style.display = 'block';
-        
-        setTimeout(() => {
-            errorToast.style.display = 'none';
-        }, 5000);
+    if (percent >= 80) {
+        className += 'compliance-high';
+    } else if (percent >= 50) {
+        className += 'compliance-medium';
     } else {
-        alert(message); // Fallback
+        className += 'compliance-low';
     }
-}
-
-function showSuccess(message) {
-    console.log('✅ Success:', message);
     
-    const successToast = document.getElementById('successToast');
-    const successMessage = document.getElementById('successMessage');
-    
-    if (successToast && successMessage) {
-        successMessage.textContent = message;
-        successToast.style.display = 'block';
-        
-        setTimeout(() => {
-            successToast.style.display = 'none';
-        }, 3000);
-    }
+    return `<span class="${className}">${percent}%</span>`;
 }
 
-function hideToast(toastId) {
-    const toast = document.getElementById(toastId);
-    if (toast) {
-        toast.style.display = 'none';
-    }
+// Gender formatting
+function formatGender(gender) {
+    if (gender === 'L' || gender === 'Laki-Laki') return 'Laki-laki';
+    if (gender === 'P' || gender === 'Perempuan') return 'Perempuan';
+    return '-';
 }
 
-// Debounce utility
+// Debounce function
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -282,55 +109,51 @@ function debounce(func, wait) {
     };
 }
 
-// Patient detail functions (placeholder)
-function showPatientDetail(patientId) {
-    console.log('👁️ Show patient detail:', patientId);
-    alert(`Menampilkan detail pasien ID: ${patientId}\nFitur dalam pengembangan.`);
-}
-
-function editPatient(patientId) {
-    console.log('✏️ Edit patient:', patientId);
-    alert(`Edit pasien ID: ${patientId}\nFitur dalam pengembangan.`);
-}
-
-// View management
-function showView(viewName) {
-    console.log('🖥️ Switching to view:', viewName);
-    
-    // Hide all views
-    const views = document.querySelectorAll('[id$="-view"]');
-    views.forEach(view => {
-        view.style.display = 'none';
-    });
-    
-    // Show selected view
-    const targetView = document.getElementById(`${viewName}-view`);
-    if (targetView) {
-        targetView.style.display = 'block';
-        
-        // Load data for specific views
-        if (viewName === 'kepatuhan') {
-            loadPatients();
-        }
+// Local storage helpers
+function saveToStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        return false;
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM loaded, initializing app...');
-    
-    // Wait a bit for all scripts to load
-    setTimeout(() => {
-        initializeApp();
-    }, 100);
-});
+function getFromStorage(key, defaultValue = null) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+        console.error('Error reading from localStorage:', error);
+        return defaultValue;
+    }
+}
 
-// Make functions available globally
-window.loadPatients = loadPatients;
-window.searchPatients = searchPatients;
-window.previousPage = previousPage;
-window.nextPage = nextPage;
-window.showPatientDetail = showPatientDetail;
-window.editPatient = editPatient;
-window.showView = showView;
-window.hideToast = hideToast;
+function removeFromStorage(key) {
+    try {
+        localStorage.removeItem(key);
+        return true;
+    } catch (error) {
+        console.error('Error removing from localStorage:', error);
+        return false;
+    }
+}
+
+// Export utility functions to global scope
+if (typeof window !== 'undefined') {
+    window.formatDate = formatDate;
+    window.formatTime = formatTime;
+    window.formatDateTime = formatDateTime;
+    window.capitalizeFirst = capitalizeFirst;
+    window.formatCurrency = formatCurrency;
+    window.validateEmail = validateEmail;
+    window.validatePhone = validatePhone;
+    window.validateRequired = validateRequired;
+    window.getComplianceBadge = getComplianceBadge;
+    window.formatGender = formatGender;
+    window.debounce = debounce;
+    window.saveToStorage = saveToStorage;
+    window.getFromStorage = getFromStorage;
+    window.removeFromStorage = removeFromStorage;
+}

@@ -1,41 +1,38 @@
-/* Responsive Design */
-
 /* Tablet Styles */
 @media (max-width: 1024px) {
     .container {
         padding: 15px;
     }
-    
-    .nav-items {
-        gap: 20px;
+
+    .header {
+        padding: 20px;
     }
-    
-    .nav-item {
-        font-size: 12px;
-        padding: 6px 12px;
+
+    .header h1 {
+        font-size: 2rem;
     }
-    
-    .table-header,
-    .table-row {
-        grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr;
+
+    .card {
+        padding: 20px;
+    }
+
+    .search-container {
         gap: 10px;
+    }
+
+    .search-input {
+        min-width: 200px;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px 8px;
         font-size: 13px;
     }
-    
-    .table-header span:nth-child(6),
-    .table-header span:nth-child(7),
-    .table-row span:nth-child(6),
-    .table-row span:nth-child(7) {
-        display: none;
-    }
-    
-    .stat-cards {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-    
-    .modal-content {
-        width: 95%;
-        padding: 20px;
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
 }
 
@@ -44,193 +41,144 @@
     .container {
         padding: 10px;
     }
-    
-    .navbar {
-        padding: 10px 15px;
+
+    .header {
+        padding: 15px;
+        margin-bottom: 20px;
     }
-    
-    .nav-items {
-        gap: 10px;
-        justify-content: center;
+
+    .header h1 {
+        font-size: 1.8rem;
     }
-    
-    .nav-item {
-        font-size: 10px;
-        padding: 4px 8px;
+
+    .header p {
+        font-size: 1rem;
     }
-    
-    .nav-icons {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
+
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
     }
-    
-    .nav-icon {
-        width: 50px;
-        height: 50px;
+
+    .card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
     }
-    
-    .nav-icon span {
-        font-size: 20px;
-    }
-    
-    .content-header {
-        padding: 15px 20px;
-        font-size: 16px;
-    }
-    
-    .content-body {
-        padding: 20px;
-    }
-    
+
     .search-container {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .search-input {
+        min-width: 100%;
         font-size: 16px; /* Prevent zoom on iOS */
     }
-    
-    .table-container {
-        overflow-x: auto;
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 15px;
+        font-size: 16px;
     }
-    
-    .table-header,
-    .table-row {
-        grid-template-columns: 1fr 1fr 1.5fr;
-        gap: 8px;
+
+    .table-wrapper {
         font-size: 12px;
-        min-width: 350px;
     }
-    
-    .table-header span:nth-child(n+4),
-    .table-row span:nth-child(n+4) {
+
+    .table th,
+    .table td {
+        padding: 8px 6px;
+    }
+
+    /* Hide less important columns on mobile */
+    .table th:nth-child(4),
+    .table th:nth-child(6),
+    .table td:nth-child(4),
+    .table td:nth-child(6) {
         display: none;
     }
-    
-    .table-row {
-        padding: 12px 10px;
-    }
-    
-    .action-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
-    }
-    
-    .export-buttons {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .export-btn {
-        width: 100%;
-        padding: 15px;
-    }
-    
+
     .pagination {
         flex-direction: column;
         gap: 10px;
     }
-    
-    .pagination button {
+
+    .pagination .btn {
         width: 100%;
+        max-width: 200px;
     }
-    
-    .detail-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+
+    #pageInfo {
+        padding: 10px 0;
+        order: -1;
     }
-    
+
     .modal-content {
         width: 95%;
-        height: 90vh;
-        padding: 15px;
-        margin: 20px;
-    }
-    
-    .stat-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .stat-card {
         padding: 20px;
-        text-align: center;
+        margin: 10px;
+    }
+
+    .form-buttons {
         flex-direction: column;
     }
-    
-    .stat-icon {
-        font-size: 36px;
+
+    .form-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
     }
-    
-    .stat-info h3 {
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .close-modal {
+        top: 10px;
+        right: 15px;
         font-size: 24px;
-    }
-    
-    .toast {
-        right: 10px;
-        left: 10px;
-        max-width: none;
     }
 }
 
 /* Small Mobile Styles */
 @media (max-width: 480px) {
-    .nav-items {
-        flex-wrap: wrap;
-        justify-content: center;
+    .header h1 {
+        font-size: 1.5rem;
     }
-    
-    .nav-item {
-        font-size: 9px;
-        padding: 3px 6px;
-    }
-    
-    .table-header,
-    .table-row {
-        grid-template-columns: 1fr 1fr;
-        min-width: 280px;
-    }
-    
-    .table-header span:nth-child(n+3),
-    .table-row span:nth-child(n+3) {
+
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
         display: none;
     }
-    
-    .content-header {
-        font-size: 14px;
-        padding: 12px 15px;
+
+    .table-wrapper {
+        font-size: 11px;
     }
-    
-    .content-body {
-        padding: 15px;
+
+    .action-btn {
+        padding: 4px 8px;
+        font-size: 10px;
     }
-    
+
     .modal-content {
-        height: 95vh;
-        padding: 10px;
-    }
-    
-    .close-modal {
-        top: 10px;
-        right: 15px;
+        height: 90vh;
+        overflow-y: auto;
     }
 }
 
 /* Landscape Mobile */
 @media (max-width: 768px) and (orientation: landscape) {
     .modal-content {
-        max-height: 90vh;
+        max-height: 85vh;
         width: 90%;
     }
-    
-    .nav-icons {
-        margin-top: 10px;
+
+    .header {
+        padding: 10px;
     }
-    
-    .stat-cards {
-        grid-template-columns: repeat(2, 1fr);
+
+    .header h1 {
+        font-size: 1.6rem;
     }
 }
 
@@ -239,78 +187,39 @@
     body {
         background: white;
     }
-    
-    body::before {
-        display: none;
-    }
-    
-    .navbar,
-    .export-buttons,
+
+    .header,
     .search-container,
     .pagination,
-    .action-btn,
-    .close-modal {
+    .btn,
+    .close-modal,
+    .modal {
         display: none;
     }
-    
-    .main-content {
+
+    .card {
         box-shadow: none;
         background: white;
+        border: 1px solid #ddd;
     }
-    
-    .table-row {
-        break-inside: avoid;
+
+    .table {
+        border: 1px solid #ddd;
     }
-    
-    .modal {
-        position: static;
-        display: block;
-        background: none;
-    }
-    
-    .modal-content {
-        box-shadow: none;
-        max-height: none;
-        overflow: visible;
+
+    .table th,
+    .table td {
+        border: 1px solid #ddd;
     }
 }
 
 /* High DPI Displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .nav-icon span,
-    .action-btn {
+    .btn,
+    .table,
+    .modal-content {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-    }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .search-input,
-    .dropdown {
-        background: #34495e;
-        color: white;
-        border-color: #5a6c7d;
-    }
-    
-    .table-row {
-        background: #2c3e50;
-        color: white;
-        border-color: #34495e;
-    }
-    
-    .detail-value {
-        color: #ecf0f1;
-    }
-    
-    .recent-activity {
-        background: #34495e;
-        color: white;
-    }
-    
-    .activity-item {
-        background: #2c3e50;
-        color: white;
     }
 }
 
@@ -323,19 +232,48 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .spinner {
         animation: none;
+        border: 4px solid #3498db;
     }
 }
 
 /* Focus Styles for Accessibility */
-@media (prefers-reduced-motion: no-preference) {
-    .nav-item:focus,
-    .search-btn:focus,
-    .action-btn:focus,
-    .export-btn:focus {
-        outline: 2px solid #3498db;
-        outline-offset: 2px;
+.btn:focus,
+.search-input:focus,
+.form-group input:focus,
+.form-group select:focus,
+.close-modal:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .search-input,
+    .form-group input,
+    .form-group select {
+        background: #2c3e50;
+        color: white;
+        border-color: #34495e;
+    }
+
+    .table {
+        background: #2c3e50;
+        color: white;
+    }
+
+    .table th {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+    }
+
+    .table td {
+        border-color: #34495e;
+    }
+
+    .detail-value {
+        background: #34495e;
+        color: #ecf0f1;
     }
 }
