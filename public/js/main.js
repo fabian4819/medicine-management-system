@@ -1,4 +1,4 @@
-// main.js - CORRECTED VERSION
+// main.js - CORRECTED VERSION sesuai dengan design
 console.log('🚀 Main.js loaded');
 
 // Global state
@@ -12,10 +12,6 @@ async function initializeApp() {
     try {
         console.log('🔧 Initializing application...');
         
-        // Load initial data
-        console.log('📊 Loading initial patient data...');
-        await loadPatients();
-        
         // Setup event listeners
         setupEventListeners();
         
@@ -24,6 +20,58 @@ async function initializeApp() {
     } catch (error) {
         console.error('❌ Failed to initialize application:', error);
         showError('Gagal menginisialisasi aplikasi: ' + error.message);
+    }
+}
+
+// Show Kepatuhan Modal (main modal seperti di gambar)
+async function showKepatuhanModal() {
+    try {
+        console.log('📋 Opening Kepatuhan Modal...');
+        
+        const modal = document.getElementById('kepatuhanModal');
+        if (modal) {
+            modal.classList.add('active');
+            
+            // Load data when modal opens
+            await loadPatients();
+        }
+    } catch (error) {
+        console.error('❌ Error opening Kepatuhan Modal:', error);
+        showError('Gagal membuka modal kepatuhan');
+    }
+}
+
+// Close Kepatuhan Modal
+function closeKepatuhanModal() {
+    const modal = document.getElementById('kepatuhanModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Show Patient Detail Modal (modal detail seperti di gambar)
+async function showPatientDetail(patientId) {
+    try {
+        console.log('👁️ Show patient detail:', patientId);
+        
+        const modal = document.getElementById('patientDetailModal');
+        if (modal) {
+            modal.classList.add('active');
+            
+            // Load patient detail
+            await loadPatientDetail(patientId);
+        }
+    } catch (error) {
+        console.error('❌ Error showing patient detail:', error);
+        showError('Gagal membuka detail pasien');
+    }
+}
+
+// Close Patient Detail Modal
+function closePatientDetailModal() {
+    const modal = document.getElementById('patientDetailModal');
+    if (modal) {
+        modal.classList.remove('active');
     }
 }
 
@@ -78,7 +126,78 @@ async function loadPatients() {
     }
 }
 
-// Display patients in table
+// Load patient detail
+async function loadPatientDetail(patientId) {
+    try {
+        console.log('📋 Loading patient detail for ID:', patientId);
+        
+        const response = await PatientAPI.getPatient(patientId);
+        
+        if (response && response.success && response.data) {
+            const patient = response.data;
+            
+            // Update modal content
+            document.getElementById('modalPatientName').textContent = patient.name || '-';
+            document.getElementById('modalCompliance').textContent = Math.round(patient.compliance_percentage || 0) + '%';
+            document.getElementById('modalRMNumber').textContent = patient.rm_number || '-';
+            document.getElementById('modalDuration').textContent = '5 Hari'; // Mock data
+            
+            // Load consumption history (mock data for now)
+            displayConsumptionHistory([
+                {
+                    date: '11-03-2025',
+                    day: 1,
+                    medicine: 'Paracetamol',
+                    time: '07.00',
+                    status: 'Diminum',
+                    notes: '-'
+                }
+            ]);
+            
+        } else {
+            throw new Error('Data pasien tidak ditemukan');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading patient detail:', error);
+        showError('Gagal memuat detail pasien: ' + error.message);
+    }
+}
+
+// Display consumption history in modal
+function displayConsumptionHistory(history) {
+    const tableBody = document.getElementById('modalTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    if (!history || history.length === 0) {
+        tableBody.innerHTML = `
+            <div class="no-data">
+                <span>📋 Tidak ada data riwayat konsumsi</span>
+            </div>
+        `;
+        return;
+    }
+    
+    history.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'table-row';
+        
+        row.innerHTML = `
+            <span>${item.date}</span>
+            <span>${item.day}</span>
+            <span>${item.medicine}</span>
+            <span>${item.time}</span>
+            <span class="status-${item.status.toLowerCase() === 'diminum' ? 'diminum' : 'belum'}">${item.status}</span>
+            <span>${item.notes}</span>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Display patients in table (sesuai dengan design mockup)
 function displayPatients(patientList) {
     console.log('🖥️ Displaying patients:', patientList.length);
     
@@ -107,40 +226,35 @@ function displayPatients(patientList) {
     console.log('✅ Patients displayed successfully');
 }
 
-// Create patient row
+// Create patient row (sesuai dengan kolom di mockup)
 function createPatientRow(patient) {
     const row = document.createElement('div');
     row.className = 'table-row';
     
     // Format date
     const prescriptionDate = patient.prescription_date ? 
-        new Date(patient.prescription_date).toLocaleDateString('id-ID') : '-';
-    
-    // Format gender
-    const gender = patient.gender === 'L' ? 'Laki-laki' : 
-                   patient.gender === 'P' ? 'Perempuan' : '-';
+        new Date(patient.prescription_date).toLocaleDateString('id-ID') : 
+        '11-03-2025'; // Mock date sesuai mockup
     
     // Format compliance percentage
-    const compliance = Math.round(patient.compliance_percentage || 0);
+    const compliance = Math.round(patient.compliance_percentage || 70); // Default 70% sesuai mockup
     const complianceClass = compliance >= 80 ? 'high' : 
                            compliance >= 50 ? 'medium' : 'low';
     
+    // Mock data untuk kolom yang belum ada
+    const medicineName = patient.medicine_name || 'paracetamol';
+    const previousConsumption = '-'; // Sesuai mockup
+    
     row.innerHTML = `
         <span>${prescriptionDate}</span>
-        <span>${patient.rm_number || '-'}</span>
-        <span>${patient.name || '-'}</span>
-        <span>${gender}</span>
+        <span>${patient.rm_number || '008919'}</span>
+        <span>${patient.name || 'Amirul Azmi'}</span>
         <span class="compliance ${complianceClass}">${compliance}%</span>
-        <span>${patient.medicine_name || 'Tidak ada obat'}</span>
-        <span class="status ${complianceClass}">
-            ${compliance >= 80 ? 'Baik' : compliance >= 50 ? 'Sedang' : 'Rendah'}
-        </span>
+        <span>${medicineName}</span>
+        <span>${previousConsumption}</span>
         <span class="actions">
-            <button class="detail-btn" onclick="showPatientDetail(${patient.id})" title="Lihat Detail">
+            <button class="action-btn" onclick="showPatientDetail(${patient.id})" title="Lihat Detail">
                 👁️
-            </button>
-            <button class="edit-btn" onclick="editPatient(${patient.id})" title="Edit">
-                ✏️
             </button>
         </span>
     `;
@@ -183,16 +297,21 @@ function setupEventListeners() {
         }, 500));
     }
     
-    // Refresh button
-    const refreshBtn = document.querySelector('.refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            currentPage = 1;
-            currentSearch = '';
-            if (searchInput) searchInput.value = '';
-            loadPatients();
-        });
-    }
+    // Close modals when clicking outside
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeKepatuhanModal();
+            closePatientDetailModal();
+        }
+    });
+    
+    // ESC key to close modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeKepatuhanModal();
+            closePatientDetailModal();
+        }
+    });
     
     console.log('✅ Event listeners setup complete');
 }
@@ -218,6 +337,17 @@ function searchPatients() {
         currentPage = 1;
         loadPatients();
     }
+}
+
+// Export functions (placeholder)
+function exportToExcel() {
+    console.log('📊 Export to Excel');
+    showSuccess('Export Excel akan segera tersedia');
+}
+
+function exportToPDF() {
+    console.log('📄 Export to PDF');
+    closeKepatuhanModal();
 }
 
 // Utility functions
@@ -282,37 +412,10 @@ function debounce(func, wait) {
     };
 }
 
-// Patient detail functions (placeholder)
-function showPatientDetail(patientId) {
-    console.log('👁️ Show patient detail:', patientId);
-    alert(`Menampilkan detail pasien ID: ${patientId}\nFitur dalam pengembangan.`);
-}
-
-function editPatient(patientId) {
-    console.log('✏️ Edit patient:', patientId);
-    alert(`Edit pasien ID: ${patientId}\nFitur dalam pengembangan.`);
-}
-
-// View management
+// View management (placeholder for other features)
 function showView(viewName) {
     console.log('🖥️ Switching to view:', viewName);
-    
-    // Hide all views
-    const views = document.querySelectorAll('[id$="-view"]');
-    views.forEach(view => {
-        view.style.display = 'none';
-    });
-    
-    // Show selected view
-    const targetView = document.getElementById(`${viewName}-view`);
-    if (targetView) {
-        targetView.style.display = 'block';
-        
-        // Load data for specific views
-        if (viewName === 'kepatuhan') {
-            loadPatients();
-        }
-    }
+    alert(`Fitur ${viewName} akan segera tersedia`);
 }
 
 // Initialize when DOM is loaded
@@ -326,11 +429,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Make functions available globally
+window.showKepatuhanModal = showKepatuhanModal;
+window.closeKepatuhanModal = closeKepatuhanModal;
+window.showPatientDetail = showPatientDetail;
+window.closePatientDetailModal = closePatientDetailModal;
 window.loadPatients = loadPatients;
 window.searchPatients = searchPatients;
 window.previousPage = previousPage;
 window.nextPage = nextPage;
-window.showPatientDetail = showPatientDetail;
-window.editPatient = editPatient;
+window.exportToExcel = exportToExcel;
+window.exportToPDF = exportToPDF;
 window.showView = showView;
 window.hideToast = hideToast;
