@@ -55,3 +55,4 @@ bower_components/
 # TypeScript compiled output
 dist/
 build/
+.vercel

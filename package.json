@@ -2,12 +2,12 @@
   "name": "medicine-management-system",
   "version": "1.0.0",
   "description": "Sistem Manajemen Obat dengan Node.js dan MySQL",
-  "main": "server/app.js",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node server/app.js",
-    "dev": "nodemon server/app.js",
-    "build": "echo 'No build step required for static files'",
-    "vercel-build": "echo 'Build completed successfully'",
+    "start": "node api/index.js",
+    "dev": "node api/index.js",
+    "build": "echo 'Build completed'",
+    "local": "nodemon api/index.js",
     "test": "echo 'No tests specified'",
     "deploy": "vercel --prod"
   },
@@ -19,7 +19,6 @@
     "morgan": "^1.10.0",
     "express-rate-limit": "^7.1.5",
     "compression": "^1.7.4",
-    "ws": "^8.14.2",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
@@ -35,12 +34,13 @@
     "healthcare",
     "nodejs",
     "mysql",
-    "vercel"
+    "vercel",
+    "serverless"
   ],
   "author": "Medicine Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/medicine-management-system.git"
+    "url": "https://github.com/fabian4819/medicine-management-system.git"
   }
 }
