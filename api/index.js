@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const path = require('path');
 require('dotenv').config();
 
 // Import our modular components
@@ -23,9 +24,11 @@ const app = express();
 
 // Environment variables
 const NODE_ENV = process.env.NODE_ENV || 'production';
+const PORT = process.env.PORT || 3000;
 
 console.log('🚀 Starting Medicine Management API...');
 console.log('📊 Environment:', NODE_ENV);
+console.log('🌐 Port:', PORT);
 
 // Security middleware
 app.use(helmet({
@@ -72,6 +75,11 @@ app.use(cors({
 app.use(morgan(isProduction ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from public directory (untuk development)
+if (!isProduction) {
+    app.use(express.static(path.join(__dirname, '../public')));
+}
 
 // API Routes dengan logging
 app.use('/api/v1/patients', (req, res, next) => {
@@ -187,12 +195,6 @@ app.get('/api/v1/health', async (req, res) => {
 
 // Environment debug endpoint
 app.get('/api/debug', (req, res) => {
-    if (isProduction) {
-        return res.status(403).json({
-            error: 'Debug endpoint not available in production'
-        });
-    }
-
     debugEnvironment();
     
     res.json({
@@ -202,6 +204,7 @@ app.get('/api/debug', (req, res) => {
             NODE_ENV: process.env.NODE_ENV,
             APP_ENV: process.env.APP_ENV,
             USE_AIVEN: process.env.USE_AIVEN,
+            PORT: process.env.PORT,
             useAiven,
             isProduction
         },
@@ -304,6 +307,13 @@ app.all('/api/*', (req, res) => {
     });
 });
 
+// Serve frontend untuk non-API routes (development only)
+if (!isProduction) {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
+    });
+}
+
 // Global error handler
 app.use((error, req, res, next) => {
     console.error('🚨 Global error handler:', {
@@ -328,6 +338,16 @@ app.use((error, req, res, next) => {
         } : undefined
     });
 });
+
+// START SERVER (untuk local development)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🌐 Server running on http://localhost:${PORT}`);
+        console.log(`📡 API available at http://localhost:${PORT}/api/v1`);
+        console.log(`🏥 Health check at http://localhost:${PORT}/api/health`);
+        console.log('✅ Server ready for requests!');
+    });
+}
 
 // Export the Express API for Vercel
 module.exports = app;

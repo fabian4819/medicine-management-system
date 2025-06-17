@@ -5,10 +5,12 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "node api/index.js",
+    "dev": "NODE_ENV=development nodemon api/index.js",
+    "dev:prod": "NODE_ENV=production node api/index.js",
     "build": "echo 'Build completed'",
-    "local": "nodemon api/index.js",
+    "local": "NODE_ENV=development USE_AIVEN=false nodemon api/index.js",
     "test": "echo 'No tests specified'",
+    "vercel-dev": "vercel dev",
     "deploy": "vercel --prod"
   },
   "dependencies": {
