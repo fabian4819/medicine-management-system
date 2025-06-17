@@ -133,7 +133,7 @@ app.get('/api/v1', (req, res) => {
         },
         documentation: {
             patients: {
-                list: 'GET /api/v1/patients?page=1&limit=10&search=keyword',
+                list: 'GET /api/v1/patients?page=1&limit=100&search=keyword',
                 detail: 'GET /api/v1/patients/:id',
                 create: 'POST /api/v1/patients'
             },
