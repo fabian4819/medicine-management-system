@@ -54,11 +54,8 @@ npm install
 
 ### 3. Konfigurasi Environment
 ```bash
-# Copy file environment
-cp .env.example .env
-
-# Edit file .env dengan konfigurasi Anda
-nano .env
+# Buat File env
+touch .env
 ```
 
 ```env
