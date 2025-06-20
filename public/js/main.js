@@ -1,4 +1,3 @@
-// main.js - CORRECTED VERSION sesuai dengan design
 console.log('🚀 Main.js loaded');
 
 // Global state
