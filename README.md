@@ -76,16 +76,7 @@ DB_ACQUIRE_TIMEOUT=60000
 DB_TIMEOUT=60000
 ```
 
-### 5. Initialize Database
-```bash
-# Membuat schema dan tabel
-npm run init-db
-
-# (Opsional) Insert sample data
-npm run seed
-```
-
-### 6. Start Application
+### 5. Start Application
 ```bash
 # Development mode
 npm run dev
