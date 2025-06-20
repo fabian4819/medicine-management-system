@@ -1,4 +1,3 @@
-// api.js - CORRECTED VERSION yang sesuai dengan backend
 console.log('🔗 API.js loaded');
 
 // Simple API client dengan error handling yang baik
