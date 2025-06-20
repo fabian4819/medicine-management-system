@@ -1,6 +1,6 @@
-# Sistem Manajemen Obat
+# Sistem Monitoring Obat
 
-Sistem manajemen obat dengan monitoring kepatuhan pasien secara real-time menggunakan MySQL dari Aiven.
+Sistem monitoring obat dengan monitoring kepatuhan pasien secara real-time menggunakan MySQL dari Aiven.
 
 ## 🚀 Fitur Utama
 
@@ -103,27 +103,26 @@ Application akan berjalan di `http://localhost:3000`
 
 ```
 medicine-management-system/
-├── public/                 # Frontend files
+├── public/                   # Frontend files
 │   ├── css/
-│   │   ├── style.css      # Main styles
-│   │   └── responsive.css # Responsive styles
+│   │   ├── style.css         # Main styles
+│   │   └── responsive.css    # Responsive styles
 │   ├── js/
-│   │   ├── main.js        # Main application logic
-│   │   ├── api.js         # API communication
-│   │   └── utils.js       # Utility functions
-│   └── index.html         # Main HTML file
-├── server/                # Backend files
-│   ├── config/
-│   │   └── database.js    # Database configuration
+│   │   ├── main.js           # Main application logic
+│   │   ├── export-filter.js  # Export Filter logic
+│   │   ├── api.js            # API communication
+│   │   └── utils.js          # Utility functions
+│   └── index.html            # Main HTML file
+├── lib/                      # Backend files
+│   ├── database.js           # Database configuration
 │   ├── routes/
-│   │   ├── patients.js    # Patient routes
-│   │   └── medicines.js   # Medicine routes
-│   └── server.js          # Main server file
-├── scripts/               # Utility scripts
-├── logs/                  # Application logs
-├── .env.example          # Environment template
-├── package.json          # Dependencies
-└── README.md             # Documentation
+│       ├── patients.js       # Patient routes
+│       └── medicines.js      # Medicine routes
+├── api/
+    ├── index.js              # Main server file
+├── .env                       # Environment
+├── package.json              # Dependencies
+└── README.md                 # Documentation
 ```
 
 ## 🔑 API Endpoints
@@ -151,182 +150,21 @@ medicine-management-system/
 ### Health Check
 - `GET /api/health` - Application health status
 
-## 🗄️ Database Schema
-
-### Tabel Utama
-
-#### patients
-```sql
-- id (SERIAL PRIMARY KEY)
-- rm_number (VARCHAR(20) UNIQUE)
-- name (VARCHAR(100))
-- birth_date (DATE)
-- gender (VARCHAR(10))
-- phone (VARCHAR(20))
-- address (TEXT)
-- created_at (TIMESTAMP)
-- updated_at (TIMESTAMP)
-```
-
-#### medicines
-```sql
-- id (SERIAL PRIMARY KEY)
-- name (VARCHAR(100))
-- type (VARCHAR(50))
-- dosage (VARCHAR(50))
-- description (TEXT)
-- created_at (TIMESTAMP)
-```
-
-#### prescriptions
-```sql
-- id (SERIAL PRIMARY KEY)
-- patient_id (INTEGER FK)
-- medicine_id (INTEGER FK)
-- doctor_name (VARCHAR(100))
-- dosage_instruction (TEXT)
-- frequency_per_day (INTEGER)
-- duration_days (INTEGER)
-- prescription_date (DATE)
-- created_at (TIMESTAMP)
-```
-
-#### medicine_consumption
-```sql
-- id (SERIAL PRIMARY KEY)
-- prescription_id (INTEGER FK)
-- scheduled_time (TIMESTAMP)
-- actual_time (TIMESTAMP)
-- status (VARCHAR(20)) -- 'scheduled', 'taken', 'missed', 'late'
-- notes (TEXT)
-- created_at (TIMESTAMP)
-```
-
-## 🔄 Real-time Features
-
-Sistem menggunakan WebSocket untuk update real-time:
-
-- **Medication Updates**: Notifikasi saat pasien minum obat
-- **New Prescriptions**: Update saat resep baru ditambahkan
-- **Compliance Changes**: Update statistik kepatuhan
-- **System Alerts**: Notifikasi sistem penting
 
 ## 📊 Monitoring & Analytics
 
 ### Dashboard Metrics
 - Total pasien aktif
 - Resep yang sedang berjalan
-- Persentase kepatuhan hari ini
+- Persentase kepatuhan
 - Dosis yang terlewat
 
 ### Reports
-- Laporan kepatuhan per pasien
+- Laporan kepatuhan
 - Statistik penggunaan obat
-- Tren kepatuhan bulanan
 - Export ke Excel/PDF
 
-## 🚀 Deployment
-
-### Using PM2
-```bash
-# Install PM2
-npm install -g pm2
-
-# Start application
-pm2 start server/server.js --name medicine-system
-
-# Monitor
-pm2 monitor
-```
-
-### Using Docker
-```bash
-# Build image
-docker build -t medicine-system .
-
-# Run container
-docker run -p 3000:3000 --env-file .env medicine-system
-```
-
-### Environment Variables untuk Production
-```env
-NODE_ENV=production
-USE_AIVEN=true
-DB_HOST=your-production-host.aivencloud.com
-# ... other production configs
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run with coverage
-npm test -- --coverage
-```
-
-## 🔧 Development
-
-### Code Style
-```bash
-# Check linting
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-```
-
-### Database Migration
-```bash
-# Create new migration
-npm run migrate:create migration-name
-
-# Run migrations
-npm run migrate:up
-
-# Rollback migrations
-npm run migrate:down
-```
-
-## 🛡️ Security Features
-
-- **Helmet.js** - Security headers
-- **Rate Limiting** - API rate limiting
-- **CORS** - Cross-origin configuration
-- **Input Validation** - Request validation
-- **SQL Injection Protection** - Parameterized queries
-- **SSL/TLS** - Secure database connections
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-Untuk support dan pertanyaan:
-- Email: support@yourdomain.com
-- Issue Tracker: [GitHub Issues](https://github.com/yourusername/medicine-management-system/issues)
-- Documentation: [Wiki](https://github.com/yourusername/medicine-management-system/wiki)
-
-## 🙏 Acknowledgments
-
-- [Aiven](https://aiven.io/) untuk layanan database PostgreSQL
-- [Express.js](https://expressjs.com/) untuk web framework
-- [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) untuk real-time communication
-- Komunitas open source untuk tools dan libraries
-
----
-
-**Catatan**: Pastikan untuk mengupdate konfigurasi database dan environment variables sesuai dengan setup Aiven Anda sebelum menjalankan aplikasi.
