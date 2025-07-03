@@ -1,4 +1,4 @@
-// main.js - CORRECTED VERSION sesuai dengan design
+// main.js - UPDATED VERSION with real compliance data
 console.log('🚀 Main.js loaded');
 
 // Global state
@@ -49,7 +49,7 @@ function closeKepatuhanModal() {
     }
 }
 
-// Show Patient Detail Modal (modal detail seperti di gambar)
+// Show Patient Detail Modal (modal detail dengan riwayat compliance)
 async function showPatientDetail(patientId) {
     try {
         console.log('👁️ Show patient detail:', patientId);
@@ -58,7 +58,7 @@ async function showPatientDetail(patientId) {
         if (modal) {
             modal.classList.add('active');
             
-            // Load patient detail
+            // Load patient detail and compliance history
             await loadPatientDetail(patientId);
         }
     } catch (error) {
@@ -126,33 +126,25 @@ async function loadPatients() {
     }
 }
 
-// Load patient detail
+// Load patient detail with real compliance history
 async function loadPatientDetail(patientId) {
     try {
         console.log('📋 Loading patient detail for ID:', patientId);
         
-        const response = await PatientAPI.getPatient(patientId);
+        // Load basic patient info
+        const patientResponse = await PatientAPI.getPatient(patientId);
         
-        if (response && response.success && response.data) {
-            const patient = response.data;
+        if (patientResponse && patientResponse.success && patientResponse.data) {
+            const patient = patientResponse.data;
             
-            // Update modal content
+            // Update modal content with real data
             document.getElementById('modalPatientName').textContent = patient.name || '-';
             document.getElementById('modalCompliance').textContent = Math.round(patient.compliance_percentage || 0) + '%';
             document.getElementById('modalRMNumber').textContent = patient.rm_number || '-';
-            document.getElementById('modalDuration').textContent = '5 Hari'; // Mock data
+            document.getElementById('modalDuration').textContent = patient.duration_days + ' Hari' || '7 Hari';
             
-            // Load consumption history (mock data for now)
-            displayConsumptionHistory([
-                {
-                    date: '11-03-2025',
-                    day: 1,
-                    medicine: 'Paracetamol',
-                    time: '07.00',
-                    status: 'Diminum',
-                    notes: '-'
-                }
-            ]);
+            // Load compliance history
+            await loadComplianceHistory(patientId);
             
         } else {
             throw new Error('Data pasien tidak ditemukan');
@@ -164,7 +156,31 @@ async function loadPatientDetail(patientId) {
     }
 }
 
-// Display consumption history in modal
+// Load real compliance history from database
+async function loadComplianceHistory(patientId) {
+    try {
+        console.log('📈 Loading compliance history for patient:', patientId);
+        
+        const response = await PatientAPI.getComplianceHistory(patientId);
+        
+        if (response && response.success && response.data && response.data.history) {
+            const history = response.data.history;
+            console.log('📊 Compliance history loaded:', history.length, 'records');
+            
+            displayConsumptionHistory(history);
+        } else {
+            console.warn('⚠️ No compliance history found');
+            displayConsumptionHistory([]);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading compliance history:', error);
+        // Still show empty history rather than error
+        displayConsumptionHistory([]);
+    }
+}
+
+// Display consumption history in modal with real data
 function displayConsumptionHistory(history) {
     const tableBody = document.getElementById('modalTableBody');
     if (!tableBody) return;
@@ -184,20 +200,34 @@ function displayConsumptionHistory(history) {
         const row = document.createElement('div');
         row.className = 'table-row';
         
+        // Format date
+        const date = new Date(item.consumption_date).toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        
+        // Format time
+        const time = item.reminder_time ? 
+            new Date('2000-01-01 ' + item.reminder_time).toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '-';
+        
         row.innerHTML = `
-            <span>${item.date}</span>
-            <span>${item.day}</span>
-            <span>${item.medicine}</span>
-            <span>${item.time}</span>
-            <span class="status-${item.status.toLowerCase() === 'diminum' ? 'diminum' : 'belum'}">${item.status}</span>
-            <span>${item.notes}</span>
+            <span>${date}</span>
+            <span>${item.day_number || '-'}</span>
+            <span>${item.medicine_name || '-'}</span>
+            <span>${time}</span>
+            <span class="status-${item.status.toLowerCase().replace(' ', '-')}">${item.status}</span>
+            <span>${item.notes || '-'}</span>
         `;
         
         tableBody.appendChild(row);
     });
 }
 
-// Display patients in table (sesuai dengan design mockup)
+// Display patients in table with real compliance data
 function displayPatients(patientList) {
     console.log('🖥️ Displaying patients:', patientList.length);
     
@@ -226,7 +256,7 @@ function displayPatients(patientList) {
     console.log('✅ Patients displayed successfully');
 }
 
-// Create patient row (sesuai dengan kolom di mockup)
+// Create patient row with real compliance data
 function createPatientRow(patient) {
     const row = document.createElement('div');
     row.className = 'table-row';
@@ -234,21 +264,25 @@ function createPatientRow(patient) {
     // Format date
     const prescriptionDate = patient.prescription_date ? 
         new Date(patient.prescription_date).toLocaleDateString('id-ID') : 
-        '11-03-2025'; // Mock date sesuai mockup
+        new Date(patient.created_at).toLocaleDateString('id-ID');
     
-    // Format compliance percentage
-    const compliance = Math.round(patient.compliance_percentage || 70); // Default 70% sesuai mockup
+    // Use real compliance percentage from database
+    const compliance = Math.round(patient.compliance_percentage || 0);
     const complianceClass = compliance >= 80 ? 'high' : 
                            compliance >= 50 ? 'medium' : 'low';
     
-    // Mock data untuk kolom yang belum ada
-    const medicineName = patient.medicine_name || 'paracetamol';
-    const previousConsumption = '-'; // Sesuai mockup
+    // Use real medicine name from database
+    const medicineName = patient.medicine_name || 'Tidak ada obat';
+    
+    // Calculate previous consumption indicator
+    const totalDoses = patient.total_doses || 0;
+    const takenDoses = patient.taken_doses || 0;
+    const previousConsumption = totalDoses > 0 ? `${takenDoses}/${totalDoses}` : '-';
     
     row.innerHTML = `
         <span>${prescriptionDate}</span>
-        <span>${patient.rm_number || '008919'}</span>
-        <span>${patient.name || 'Amirul Azmi'}</span>
+        <span>${patient.rm_number || 'RM000000'}</span>
+        <span>${patient.name || 'Nama Tidak Diketahui'}</span>
         <span class="compliance ${complianceClass}">${compliance}%</span>
         <span>${medicineName}</span>
         <span>${previousConsumption}</span>
@@ -316,6 +350,52 @@ function setupEventListeners() {
     console.log('✅ Event listeners setup complete');
 }
 
+// Filter functions
+function toggleFilterPanel() {
+    const filterPanel = document.getElementById('filterPanel');
+    if (filterPanel) {
+        const isVisible = filterPanel.style.display === 'block';
+        filterPanel.style.display = isVisible ? 'none' : 'block';
+    }
+}
+
+function applyFilters() {
+    // Get filter values
+    const gender = document.getElementById('filterGender').value;
+    const compliance = document.getElementById('filterCompliance').value;
+    const medicine = document.getElementById('filterMedicine').value;
+    const dateFrom = document.getElementById('filterDateFrom').value;
+    const dateTo = document.getElementById('filterDateTo').value;
+    
+    // Build search query (simplified for now)
+    let searchQuery = '';
+    if (medicine) {
+        searchQuery = medicine;
+    }
+    
+    currentSearch = searchQuery;
+    currentPage = 1;
+    loadPatients();
+    
+    showSuccess('Filter diterapkan');
+}
+
+function clearFilters() {
+    // Clear all filter inputs
+    document.getElementById('filterGender').value = '';
+    document.getElementById('filterCompliance').value = '';
+    document.getElementById('filterMedicine').value = '';
+    document.getElementById('filterDateFrom').value = '';
+    document.getElementById('filterDateTo').value = '';
+    document.getElementById('searchInput').value = '';
+    
+    currentSearch = '';
+    currentPage = 1;
+    loadPatients();
+    
+    showSuccess('Filter dihapus');
+}
+
 // Pagination functions
 function previousPage() {
     if (currentPage > 1) {
@@ -339,15 +419,90 @@ function searchPatients() {
     }
 }
 
-// Export functions (placeholder)
+// Export functions
 function exportToExcel() {
     console.log('📊 Export to Excel');
-    showSuccess('Export Excel akan segera tersedia');
+    try {
+        // Simple export functionality
+        const csvContent = generateCSVContent();
+        downloadCSV(csvContent, 'data-kepatuhan-pasien.csv');
+        showSuccess('Data berhasil diexport ke Excel');
+    } catch (error) {
+        console.error('❌ Export error:', error);
+        showError('Gagal export data: ' + error.message);
+    }
 }
 
 function exportToPDF() {
     console.log('📄 Export to PDF');
-    closeKepatuhanModal();
+    showSuccess('Export PDF akan segera tersedia');
+}
+
+function exportPatientDetail() {
+    console.log('📊 Export patient detail');
+    showSuccess('Export detail pasien akan segera tersedia');
+}
+
+function printPatientDetail() {
+    console.log('🖨️ Print patient detail');
+    window.print();
+}
+
+// Generate CSV content for export
+function generateCSVContent() {
+    const headers = ['Tanggal Terima', 'No RM', 'Nama Pasien', 'Persentase Kepatuhan', 'Obat', 'Konsumsi Sebelumnya'];
+    const rows = patients.map(patient => [
+        patient.prescription_date ? new Date(patient.prescription_date).toLocaleDateString('id-ID') : '-',
+        patient.rm_number || '-',
+        patient.name || '-',
+        Math.round(patient.compliance_percentage || 0) + '%',
+        patient.medicine_name || '-',
+        patient.total_doses > 0 ? `${patient.taken_doses}/${patient.total_doses}` : '-'
+    ]);
+    
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(field => `"${field}"`).join(','))
+        .join('\n');
+    
+    return csvContent;
+}
+
+// Download CSV file
+function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Sync data function
+async function syncData() {
+    try {
+        console.log('🔄 Syncing data...');
+        showLoading(true);
+        await loadPatients();
+        showSuccess('Data berhasil disinkronisasi');
+    } catch (error) {
+        console.error('❌ Sync error:', error);
+        showError('Gagal sinkronisasi data: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Confirm close function
+function confirmClose() {
+    if (confirm('Apakah Anda yakin ingin menutup modal?')) {
+        closeKepatuhanModal();
+    }
 }
 
 // Utility functions
@@ -439,5 +594,12 @@ window.previousPage = previousPage;
 window.nextPage = nextPage;
 window.exportToExcel = exportToExcel;
 window.exportToPDF = exportToPDF;
+window.exportPatientDetail = exportPatientDetail;
+window.printPatientDetail = printPatientDetail;
+window.syncData = syncData;
+window.confirmClose = confirmClose;
+window.toggleFilterPanel = toggleFilterPanel;
+window.applyFilters = applyFilters;
+window.clearFilters = clearFilters;
 window.showView = showView;
 window.hideToast = hideToast;
