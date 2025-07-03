@@ -1,4 +1,3 @@
-// export-filter.js - Export and Filter Functionality
 console.log('📊 Export & Filter module loaded');
 
 // Global filter state

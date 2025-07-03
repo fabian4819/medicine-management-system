@@ -1,4 +1,3 @@
-// utils.js - Simple version
 console.log('🔧 Utils.js loaded');
 
 // Basic utility functions

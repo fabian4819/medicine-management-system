@@ -1,4 +1,3 @@
-// main.js - UPDATED VERSION with real compliance data
 console.log('🚀 Main.js loaded');
 
 // Global state
