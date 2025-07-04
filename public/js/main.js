@@ -74,10 +74,10 @@ function closePatientDetailModal() {
     }
 }
 
-// Load patients function
+// Load patients function (updated for filtered data)
 async function loadPatients() {
     try {
-        console.log('📊 Loading patients...', { 
+        console.log('📊 Loading patients with monitoring data...', { 
             page: currentPage, 
             limit: currentLimit, 
             search: currentSearch 
@@ -101,12 +101,16 @@ async function loadPatients() {
         
         if (response && response.success && response.data) {
             patients = response.data.patients || [];
-            console.log('👥 Loaded patients:', patients.length);
+            console.log('👥 Loaded patients with monitoring data:', patients.length);
             
             displayPatients(patients);
             updatePagination(response.data.pagination);
             
-            showSuccess(`Berhasil memuat ${patients.length} data pasien`);
+            if (patients.length > 0) {
+                showSuccess(`Berhasil memuat ${patients.length} pasien dengan data pemantauan`);
+            } else {
+                showInfo('Tidak ada pasien dengan data pemantauan yang ditemukan');
+            }
         } else {
             console.warn('⚠️ Invalid response structure:', response);
             throw new Error('Format response tidak valid');
@@ -146,7 +150,7 @@ async function loadPatientDetail(patientId) {
             await loadComplianceHistory(patientId);
             
         } else {
-            throw new Error('Data pasien tidak ditemukan');
+            throw new Error('Data pasien tidak ditemukan atau tidak memiliki data pemantauan');
         }
         
     } catch (error) {
@@ -226,9 +230,9 @@ function displayConsumptionHistory(history) {
     });
 }
 
-// Display patients in table with real compliance data
+// Display patients in table with real compliance data (updated messages)
 function displayPatients(patientList) {
-    console.log('🖥️ Displaying patients:', patientList.length);
+    console.log('🖥️ Displaying patients with monitoring data:', patientList.length);
     
     const tableBody = document.getElementById('patientsTableBody');
     if (!tableBody) {
@@ -241,7 +245,14 @@ function displayPatients(patientList) {
     if (!patientList || patientList.length === 0) {
         tableBody.innerHTML = `
             <div class="no-data">
-                <span>🏥 Tidak ada data pasien ditemukan</span>
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                    <h3 style="margin: 0 0 8px 0; color: #333;">Tidak Ada Data Pemantauan</h3>
+                    <p style="margin: 0; font-size: 14px;">
+                        Hanya menampilkan pasien yang memiliki data riwayat pemantauan minum obat.
+                        ${currentSearch ? `Tidak ada hasil untuk pencarian "${currentSearch}"` : 'Belum ada pasien dengan data pemantauan.'}
+                    </p>
+                </div>
             </div>
         `;
         return;
@@ -252,10 +263,10 @@ function displayPatients(patientList) {
         tableBody.appendChild(row);
     });
     
-    console.log('✅ Patients displayed successfully');
+    console.log('✅ Patients with monitoring data displayed successfully');
 }
 
-// Create patient row with real compliance data
+// Create patient row with real compliance data (unchanged)
 function createPatientRow(patient) {
     const row = document.createElement('div');
     row.className = 'table-row';
@@ -295,16 +306,21 @@ function createPatientRow(patient) {
     return row;
 }
 
-// Update pagination
+// Update pagination (add info about filtered data)
 function updatePagination(pagination) {
-    console.log('📄 Updating pagination:', pagination);
+    console.log('📄 Updating pagination for filtered data:', pagination);
     
     const pageInfo = document.getElementById('pageInfo');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     
     if (pageInfo) {
-        pageInfo.textContent = `Halaman ${pagination.currentPage} dari ${pagination.totalPages}`;
+        pageInfo.innerHTML = `
+            Halaman ${pagination.currentPage} dari ${pagination.totalPages}
+            <small style="display: block; font-size: 11px; color: #666; margin-top: 2px;">
+                (${pagination.totalRecords} pasien dengan data pemantauan)
+            </small>
+        `;
     }
     
     if (prevBtn) {
@@ -323,6 +339,9 @@ function setupEventListeners() {
     // Search functionality
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
+        // Update placeholder text
+        searchInput.placeholder = "Cari pasien dengan data pemantauan...";
+        
         searchInput.addEventListener('input', debounce((e) => {
             currentSearch = e.target.value;
             currentPage = 1;
@@ -349,7 +368,7 @@ function setupEventListeners() {
     console.log('✅ Event listeners setup complete');
 }
 
-// Filter functions
+// Filter functions (updated messages)
 function toggleFilterPanel() {
     const filterPanel = document.getElementById('filterPanel');
     if (filterPanel) {
@@ -376,7 +395,7 @@ function applyFilters() {
     currentPage = 1;
     loadPatients();
     
-    showSuccess('Filter diterapkan');
+    showSuccess('Filter diterapkan (hanya pasien dengan data pemantauan)');
 }
 
 function clearFilters() {
@@ -418,14 +437,14 @@ function searchPatients() {
     }
 }
 
-// Export functions
+// Export functions (updated for filtered data)
 function exportToExcel() {
-    console.log('📊 Export to Excel');
+    console.log('📊 Export to Excel (filtered data)');
     try {
         // Simple export functionality
         const csvContent = generateCSVContent();
-        downloadCSV(csvContent, 'data-kepatuhan-pasien.csv');
-        showSuccess('Data berhasil diexport ke Excel');
+        downloadCSV(csvContent, 'data-kepatuhan-pasien-pemantauan.csv');
+        showSuccess('Data pasien dengan pemantauan berhasil diexport ke Excel');
     } catch (error) {
         console.error('❌ Export error:', error);
         showError('Gagal export data: ' + error.message);
@@ -433,8 +452,8 @@ function exportToExcel() {
 }
 
 function exportToPDF() {
-    console.log('📄 Export to PDF');
-    showSuccess('Export PDF akan segera tersedia');
+    console.log('📄 Export to PDF (filtered data)');
+    showSuccess('Export PDF data pemantauan akan segera tersedia');
 }
 
 function exportPatientDetail() {
@@ -447,9 +466,9 @@ function printPatientDetail() {
     window.print();
 }
 
-// Generate CSV content for export
+// Generate CSV content for export (updated headers)
 function generateCSVContent() {
-    const headers = ['Tanggal Terima', 'No RM', 'Nama Pasien', 'Persentase Kepatuhan', 'Obat', 'Konsumsi Sebelumnya'];
+    const headers = ['Tanggal Terima', 'No RM', 'Nama Pasien', 'Persentase Kepatuhan', 'Obat', 'Data Pemantauan'];
     const rows = patients.map(patient => [
         patient.prescription_date ? new Date(patient.prescription_date).toLocaleDateString('id-ID') : '-',
         patient.rm_number || '-',
@@ -482,13 +501,13 @@ function downloadCSV(content, filename) {
     }
 }
 
-// Sync data function
+// Sync data function (updated message)
 async function syncData() {
     try {
-        console.log('🔄 Syncing data...');
+        console.log('🔄 Syncing monitoring data...');
         showLoading(true);
         await loadPatients();
-        showSuccess('Data berhasil disinkronisasi');
+        showSuccess('Data pemantauan berhasil disinkronisasi');
     } catch (error) {
         console.error('❌ Sync error:', error);
         showError('Gagal sinkronisasi data: ' + error.message);
@@ -544,6 +563,14 @@ function showSuccess(message) {
             successToast.style.display = 'none';
         }, 3000);
     }
+}
+
+// New function for info messages
+function showInfo(message) {
+    console.log('ℹ️ Info:', message);
+    
+    // You can create an info toast similar to success/error, or use success for now
+    showSuccess(message);
 }
 
 function hideToast(toastId) {
